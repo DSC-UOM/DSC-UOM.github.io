@@ -1,0 +1,814 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>Build your first full web app</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid="UA-52746336-1"
+                  id="your-first-webapp"
+                  title="Build your first full web app"
+                  environment="web"
+                  feedback-link="https://github.com/googlecodelabs/your-first-pwapp/issues">
+    
+      <google-codelab-step label="Introductions" duration="0">
+        <p><strong>Last Updated:</strong> 06-09-2020</p>
+<h2 is-upgraded><strong>What you&#39;ll build</strong></h2>
+<p>In this codelab, you&#39;re going to build an anonymous messaging board. Your app will:</p>
+<ul>
+<li>Allow users to post a message on a page which everyone else can see.</li>
+<li>Automatically refresh others messages when you post one.</li>
+<li>Save all messages so that they are persistent across sessions.</li>
+</ul>
+<p class="image-container"><img style="width: 496.50px" src="img\401cb0b9120f9f7a.png"></p>
+<aside class="warning"><p><strong>Note:</strong> Note that this app is not fully secure and would not be ready to be placed in production and advertised to a wider audience. It is intended for learning some key web technologies.</p>
+</aside>
+<h2 class="checklist" is-upgraded><strong>What you&#39;ll learn</strong></h2>
+<ul class="checklist">
+<li>How to create a web app which makes calls to an API.</li>
+<li>Host an API which has both post and get routes.</li>
+<li>Connect a backend API which you create to a cloud hosted database (MongoDB Atlas)</li>
+<li>How to host the whole product on a web server.</li>
+</ul>
+<p>Hopefully by the end of the project you will be able to take what you have learned to build a more advanced web app and win some hackathons!</p>
+<h2 is-upgraded><strong>What you&#39;ll need</strong></h2>
+<ul>
+<li>Some basic knowledge of HTML, CSS, JavaScript, Node.js.</li>
+<li>An up to date browser (We will be using chrome but its up to you)</li>
+<li>Node.js and NPM package manager which can be downloaded from here: <a href="https://nodejs.org/en/" target="_blank">https://nodejs.org/en/</a></li>
+<li>MongoDB:</li>
+</ul>
+<p><a href="https://docs.mongodb.com/guides/server/install/" target="_blank">https://docs.mongodb.com/guides/server/install/</a></p>
+<ul>
+<li>A text editor</li>
+<li>Git (optional)</li>
+</ul>
+<h2 is-upgraded><strong>Support</strong></h2>
+<ul>
+<li>Get tech support in our discord server: <a href="https://discord.gg/brQMHdk" target="_blank">https://discord.gg/brQMHdk</a></li>
+<li>At each step of the project there is a branch on git with the completed code: <a href="https://github.com/DSC-UOM/Intro-to-hackathons/branches/active" target="_blank">https://github.com/DSC-UOM/Intro-to-hackathons/branches/active</a></li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="How are we going to build it?" duration="3">
+        <h2 is-upgraded><strong>What is a web application?</strong></h2>
+<p>We are going to start at the foundation and quickly build up to a full web application. First things first, what is a web app?</p>
+<p>A web app is a piece of software which is run on a web server rather than being installed on the that you are currently using. It uses a web browser to request data from a server and then executes any code and displays it within the browser. </p>
+<h3 is-upgraded><strong>How are they built?</strong></h3>
+<p>Web apps can be broken down into 2 main sections. The first is the front end of the application, this is the code and content that creates what the user will see when they access the site. The second is the backend which contains the logic and the data which the application runs on. This can be broken down further to the application and storage. The application is generally written in any common programming language (Python, Java, Node.js).  The storage consists of a database (MongoDB, MySQL, PostgreSQL).</p>
+<p class="image-container"><img style="width: 424.50px" src="img\2397ef36ace46bc5.png"></p>
+<p>The diagram illustrates the user interacting with the front end and then the front end fetching data to display front the backend web server.</p>
+<h2 is-upgraded><strong>Our architecture</strong></h2>
+<p>So what are we going to use for our frontend, backend application and database? There are many options and there is no correct answer as each different language and database has pros and cons and it completely depends on what you are building. For ours we have gone for things that are the easiest to understand and build with.</p>
+<h3 is-upgraded><img style="width: 32.50px" src="img\a1eb382325f4ccae.png">  <strong>The frontend: Vanilla JavaScript</strong></h3>
+<p>There are many options for the front end and more being created every month. All frontends will run on JavaScript as it is the language that all common browsers can understand and run. You may also hear about JavaScript frameworks such as Angular, React and Vue. These are all still JavaScript but make development easier to manage when you have larger applications. They are quite complex, so we won&#39;t be covering them in this code lab, but they we will be running a series on building a portfolio website using angular in the future so look out for that!</p>
+<h3 is-upgraded><img style="width: 34.50px" src="img\1c638645dbc06152.png">  <strong>The backend: Node.js</strong></h3>
+<p>Again the options for building a backend server are very broad, there is even more than for the front end! Node.js is unique because it uses the same syntax as javascript so you can write both the front end and backend in the same language! This makes it very popular in developing web apps and its extensive library of packages (more on those later) makes complex problems very easy to solve.</p>
+<h3 is-upgraded><img style="width: 33.50px" src="img\af3ddf8986bc644b.png"><strong>  The database: MongoDB</strong></h3>
+<p>MongoDB is document database, which means instead of storing data in traditional relational tables it stores them in JSON-like documents (What is a JSON? <a href="https://www.w3schools.com/js/js_json_intro.asp" target="_blank">Click here</a>). The object based features makes it very useful in web development as you can pass data as objects and very easily use it. Also, its cloud features such as MongoDB Atlas will make it easy for us to host it on the web later on!</p>
+<aside class="special"><p><strong>Extra:</strong> What is a JSON? <a href="https://www.w3schools.com/js/js_json_intro.asp" target="_blank">Click here</a> to learn more!</p>
+</aside>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Getting setup" duration="5">
+        <h2 is-upgraded><strong>Make sure the environment is set up!</strong></h2>
+<p>Before we start we need to make sure that all your software is set up to run our application. We can run some commands to make sure its all working.</p>
+<h3 is-upgraded><strong>Create a folder and initial file</strong></h3>
+<p>First we need to create a folder the project itself and to get started we are going to set up a client folder and an index.html file.</p>
+<p>You can get this structure plus all the resources you need for this project from our GitHub:</p>
+<p><a href="https://github.com/DSC-UOM/Intro-to-hackathons-getting-started" target="_blank"><paper-button class="colored" raised>Getting started repository</paper-button></a></p>
+<p>If you are creating it yourself then the folder structure should look like this:</p>
+<p class="image-container"><img style="width: 325.00px" src="img\c7c888748f62f140.png"></p>
+<h3 is-upgraded><strong>Node, NPM &amp; MongoDB</strong></h3>
+<p>We need to validate that you have correctly installed node and NPM. Don&#39;t worry if your versions don&#39;t match with these as long as you can run these command you should be fine!</p>
+<pre>Intro-to-hackathons&gt; node --version
+V12.18.3
+Intro-to-hackathons&gt; npm --version
+6.14.6
+Intro-to-hackathons&gt; mongo --version
+MongoDB shell version v4.4.0</pre>
+<h3 is-upgraded><strong>Initial HTML File</strong></h3>
+<p>Let&#39;s start simple and create a page for our app! If you cloned the git repository you will already have this code, if not then you can copy and paste it or type it out and change it however you like!</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/master/client/index.html" target="_blank"><code>index.html</code></a></h3>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&#34;en&#34;&gt;
+&lt;head&gt;
+    &lt;meta charset=&#34;UTF-8&#34;&gt;
+    &lt;meta name=&#34;viewport&#34; content=&#34;width=device-width, initial-scale=1.0&#34;&gt;
+    &lt;title&gt; LetsChat - Manchester &lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;header&gt;
+        &lt;h1&gt; LetsChat - Manchester &lt;/h1&gt;
+    &lt;/header&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<h3 is-upgraded><strong>Install and run live-server</strong></h3>
+<p>Now that you have NPM installed you can use its packages for some really cool things, such as hosting your site locally which we are going to do now with <a href="https://www.npmjs.com/package/live-server" target="_blank">live-server</a>! </p>
+<aside class="special"><p><strong>Extra:</strong> What are NPM packages? <a href="https://www.w3schools.com/js/js_json_intro.asp" target="_blank">Click here</a> to learn more!</p>
+</aside>
+<p>First lets install live-server. We are going to install it globally so use the -g flag.</p>
+<pre>Intro-to-hackathons&gt; npm install -g live-server</pre>
+<p>Hopefully you should see a bunch of installs which end in something similar to this.</p>
+<pre>+ live-server@1.2.1
+added 194 packages from 149 contributors in 10.35s</pre>
+<p>We are now going to use live server to start out our application! Move into the client folder and run.</p>
+<pre>Intro-to-hackathons\client&gt; live-server</pre>
+<p>This should open your browser window on the address: <a href="http://127.0.0.1:8080/" target="_blank">http://127.0.0.1:8080/</a></p>
+<p class="image-container"><img style="width: 624.00px" src="img\9985bb47ec34117f.png"></p>
+<p>We are all set up!</p>
+<h2 class="checklist" is-upgraded>What we&#39;ve covered</h2>
+<ul class="checklist">
+<li>Install and validate Node, NPM and MongoDB</li>
+<li>Use NPM to install a package</li>
+<li>Host a webpage on your local machine</li>
+</ul>
+<p>Let&#39;s make the client look a little better!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Creating a basic client and form" duration="10">
+        <h2 class="checklist" is-upgraded>What you&#39;ll learn</h2>
+<ul class="checklist">
+<li>How to import CSS framework and use it.</li>
+<li>How to create a HTML form.</li>
+<li>How to connect the form to JavaScript.</li>
+</ul>
+<h2 is-upgraded><strong>Import and use a CSS framework</strong></h2>
+<p>A CSS framework predefines some CSS which you can then use in an application. It is a great way to quickly get started and standardise the look of your website. Our app is going to be very basic, so we are going to use a very simple and lightweight Framwork called <a href="http://getskeleton.com/" target="_blank">Skeleton CSS</a>. This framework adds less code than some more common libraries such as bootstrap due to it removing some of the more complex features.</p>
+<p>Adding a CSS framework is super simple you can add one line of code!</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-basic-client-and-form/client/index.html" target="_blank"><code>index.html</code></a></h3>
+<pre><code>&lt;head&gt;
+    &lt;meta charset=&#34;UTF-8&#34;&gt;
+    &lt;meta name=&#34;viewport&#34; content=&#34;width=device-width, initial-scale=1.0&#34;&gt;
+    &lt;link rel=&#34;stylesheet&#34; href=&#34;https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css&#34;&gt;
+    &lt;title&gt; LetsChat - Manchester &lt;/title&gt;
+&lt;/head&gt;</code></pre>
+<p>As you can see we have added the link tag which will import the framework from the link which it is hosted on.</p>
+<p>Now if you go back to your browser you can already see the changes!</p>
+<p class="image-container"><img style="width: 518.50px" src="img\e479f5e3d6f06508.png"></p>
+<h2 is-upgraded><strong>Adding our own CSS</strong></h2>
+<p>We probably want to use some of our own CSS as well so for this we are going to use a custom CSS stylesheet.</p>
+<p>For this we just need to make a few changes:</p>
+<p>Create a CSS file.</p>
+<p class="image-container"><img style="width: 322.00px" src="img\6872f06f2f3a37d8.png"></p>
+<p>Add a rule to that CSS file.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-basic-client-and-form/client/styles.css" target="_blank"><code>styles.css</code></a></h3>
+<pre><code>.title {
+    text-align: center
+}</code></pre>
+<p>Add a class which will use the rule that we made.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-basic-client-and-form/client/index.html" target="_blank"><code>index.html</code></a></h3>
+<pre><code>&lt;header&gt;
+    &lt;h1 class=&#34;title&#34;&gt; LetsChat - Manchester &lt;/h1&gt;
+&lt;/header&gt;</code></pre>
+<p>You should now see that in your browser that the text is aligned in the center.</p>
+<h2 is-upgraded><strong>Creating a form</strong></h2>
+<p>Let&#39;s add a form to our page so the user can input some text!</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-basic-client-and-form/client/index.html" target="_blank"><code>index.html</code></a></h3>
+<pre><code>&lt;form&gt;
+    &lt;label for=&#34;name&#34;&gt;Name&lt;/label&gt;
+    &lt;input type=&#34;text&#34; id=&#34;name&#34; name=&#34;name&#34; /&gt;
+    &lt;label for=&#34;content&#34;&gt;Chat&lt;/label&gt;
+    &lt;textarea type=&#34;text&#34; id=&#34;content&#34; name=&#34;content&#34;&gt;&lt;/textarea&gt;
+    &lt;button&gt;Send your Chat!&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<p>If you check your browser it doesn&#39;t look great! Let&#39;s add some CSS from Skeleton CSS to make it look better!</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-basic-client-and-form/client/index.html" target="_blank"><code>index.html</code></a></h3>
+<pre><code>&lt;form&gt;
+    &lt;label for=&#34;name&#34;&gt;Name&lt;/label&gt;
+    &lt;input class=&#34;u-full-width&#34; type=&#34;text&#34; id=&#34;name&#34; name=&#34;name&#34; /&gt;
+    &lt;label for=&#34;content&#34;&gt;Chat&lt;/label&gt;
+    &lt;textarea class=&#34;u-full-width&#34; type=&#34;text&#34; id=&#34;content&#34; name=&#34;content&#34;&gt;&lt;/textarea&gt;
+     &lt;button class=&#34;button-primary&#34;&gt;Send your Chat!&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+<p>Better but not quite there! Let&#39;s add a custom class to the form!</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-basic-client-and-form/client/index.html" target="_blank"><code>index.html</code></a></h3>
+<pre><code>&lt;form class=&#34;chat-form&#34;&gt;
+    &lt;label for=&#34;name&#34;&gt;Name&lt;/label&gt;</code></pre>
+<p>And now the CSS</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-basic-client-and-form/client/styles.css" target="_blank"><code>styles.css</code></a></h3>
+<pre><code>.chat-form {
+  width: 50%;
+  margin: 0 auto;
+}</code></pre>
+<h2 is-upgraded><strong>Adding JavaScript</strong></h2>
+<p>Let&#39;s add some basic JavaScript so that we can find out when a user clicks the send button!</p>
+<p>First create a client.js file.</p>
+<p class="image-container"><img style="width: 322.00px" src="img\5c812f3a3c31d1cb.png"></p>
+<aside class="warning"><p><strong>Remember:</strong> Add the script tag which links to the JavaScript file after the main body of your HTML</p>
+<p><code>&lt;script src=&#34;client.js&#34;&gt;&lt;/script&gt;</code></p>
+</aside>
+<p>Then we are going to add the code to select the button and log out when it is clicked.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-basic-client-and-form/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>const form = document.querySelector(&#39;form&#39;);
+
+form.addEventListener(&#39;submit&#39;, (event) =&gt; {
+    event.preventDefault();
+    console.log(&#34;Button was clicked&#34;);
+});</code></pre>
+<p>Let&#39;s break down what we just added!</p>
+<p><code>const form = document.querySelector(&#39;form&#39;);</code></p>
+<p>The first thing that we needed to do was be able to identify what we wanted to manipulate or monitor. For this we can use querySelector and then select the <code>&lt;form&gt;</code> which we have.</p>
+<p><code>form.addEventListener(&#39;submit&#39;, (event) =&gt; {});</code></p>
+<p>We then need to detect when the button in the form is clicked. Luckily for us an event is triggered when the button is clicked known as the <code>&#39;submit&#39;</code>event. Therefore, anything that we put in the arrow function will be called when we click the button.</p>
+<p><code>event.preventDefault();</code></p>
+<p>By default, when a form is submitted it will try and submit the data inside the form which will refresh the page. We don&#39;t want that to happen as we will be dealing with the data ourselves, so we have to prevent the behaviour.</p>
+<aside class="special"><p><strong>Extra:</strong> What are arrow functions? <a href="https://www.w3schools.com/js/js_arrow_function.asp" target="_blank">Click here</a> to learn more!</p>
+</aside>
+<h2 is-upgraded><strong>Getting the submitted data</strong></h2>
+<p>Okay so now we can detect when the user wants to send a chat. But we haven&#39;t got the data that they are submitting, and they don&#39;t know if it&#39;s been submitted. Let&#39;s change that.</p>
+<p>Lets add some code to grab the data from the form.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-basic-client-and-form/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>form.addEventListener(&#39;submit&#39;, (event) =&gt; {
+    event.preventDefault();
+    const formData = new FormData(form);
+
+    const name = formData.get(&#39;name&#39;);
+    const content = formData.get(&#39;content&#39;);
+
+    const chat = {
+        name,
+        content
+    }
+
+    console.log(chat);
+    form.reset();
+});</code></pre>
+<p><code>const formData = new FormData(form);</code></p>
+<p>Form data is a class that is built into JavaScript. It allows you to access the data that a form contains. You have to let it know which form we are selecting so you need to pass in the form variable that we created earlier.</p>
+<p><code>const name = formData.get(&#39;name&#39;);</code></p>
+<p>We then use the <code>formData</code> object that we just created to select the name property from the input that we created in the html (<code>type=&#34;text&#34; id=&#34;name&#34; name=&#34;name&#34; /&gt;)</code>. We then do the same for the content.</p>
+<pre><code>const chat = {
+        name,
+        content
+    }
+console.log(chat);</code></pre>
+<p>Using the data that we just grabbed from the form we then create an object and log it out. Check your browser and you should see something like this in the log when you submit some data:</p>
+<p class="image-container"><img style="width: 550.00px" src="img\435f0df942166e25.png"></p>
+<p><code>form.reset();</code></p>
+<p>So that the user knows that they have submitted their data we are going to reset the form which can be done very easily with the built-in <code>reset</code> function.</p>
+<p>Great, we now have a form the user send data through!</p>
+<p class="image-container"><img style="width: 624.00px" src="img\3769e1c4bc1ac288.png"></p>
+<h2 class="checklist" is-upgraded>What we&#39;ve covered</h2>
+<ul class="checklist">
+<li>We imported a CSS framework and used it</li>
+<li>We created an HTML form.</li>
+<li>We connected the form to JavaScript.</li>
+</ul>
+<p>Let&#39;s set up a server to receive the data.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Creating the server" duration="10">
+        <h2 class="checklist" is-upgraded>What you&#39;ll learn</h2>
+<ul class="checklist">
+<li>How to initialise an NPM package.json.</li>
+<li>How to use NPM to install a package</li>
+<li>How to set up express</li>
+<li>How to create two routes (get and post)</li>
+<li>How to set up responses for each route.</li>
+</ul>
+<h2 is-upgraded><strong>Package.json</strong></h2>
+<p>The first thing we need to do is set up a Node.js Package.json. Let&#39;s create a new server folder and then in the server folder run the following command.</p>
+<p class="image-container"><img style="width: 326.00px" src="img\cc96b9b9fb922548.png"></p>
+<pre>Intro-to-hackathons\server&gt; npm init
+This utility will walk you through creating a package.json file.</pre>
+<p>You will see lots of text and it will ask you many questions. You can leave all of them as default or experiment with the if you want to. This will then create a <code>package.json</code> file. This will hold all the information about the packages that you have installed and some general information about the project itself.</p>
+<aside class="special"><p><strong>Extra:</strong> Want to know more about package.json? <a href="https://docs.npmjs.com/creating-a-package-json-file" target="_blank">Click here</a>!</p>
+</aside>
+<p>Now that we have our package.json created we can start installing some NPM packages to help us create our backend server.</p>
+<h2 is-upgraded><strong>Installing Express and Morgan.</strong></h2>
+<p>Okay so we are now going to install both Express and Morgan. Express is a web framework which we can use to easily set up the infrastructure for our server. This includes things like routing and handling different types of requests, we will cover both of these topics later. Morgan is more simple. We are just going to use it to log all the requests that the server gets to the console, so we can more easily see what is happening!</p>
+<p>We can install them both with a single line:</p>
+<pre>Intro-to-hackathons\server&gt; npm install express morgan</pre>
+<p>You should now see a new folder in your server directory called <code>node_modules</code> this is where all of your packages will be placed.</p>
+<aside class="special"><p><strong>Extra:</strong> Want to know more about Express and Morgan? <a href="https://expressjs.com/" target="_blank">Click here</a> and <a href="https://www.npmjs.com/package/morgan" target="_blank">here</a>!</p>
+</aside>
+<h2 is-upgraded><strong>Setting up the server</strong></h2>
+<p>To set up the server we need to first create an index.js file which is the first file that will be run when we start the server. Your full directory structure should look something like this:</p>
+<p class="image-container"><img style="width: 326.00px" src="img\7f0785df68358be9.png"></p>
+<p>Okay lets write some code!</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-the-server/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>const express = require(&#39;express&#39;);
+
+const app = express();
+
+app.listen(5000, () =&gt; {
+    console.log(&#39;Listening on http://localhost:5000&#39;);
+});</code></pre>
+<p><code>const express = require(&#39;express&#39;);</code></p>
+<p>We need to import the express package that we just installed so that we can use it in code, this is the convention for making imports in Node.js.</p>
+<p><code>const app = express();</code></p>
+<p>We then need to create an app using express.</p>
+<pre><code>app.listen(5000, () =&gt; {
+    console.log(&#39;Listening on http://localhost:5000&#39;);
+});</code></pre>
+<p>We then need to tell the app which port to listen on, port are a topic that we are not going to cover in this code lab but you can think of computers as having lots of open connections, and we are telling the application which on to connect to. In this case we are telling it to connect to port <code>5000</code>. Once we are connected we then run the arrow function to log out that the server is running.</p>
+<p>To be able to run the server we need to define what NPM is going to do to start it. We do this in the <code>package.json</code>. We are going to define the start script like this.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-the-server/server/package.json" target="_blank"><code>package.json</code></a></h3>
+<pre><code>&#34;scripts&#34;: {
+    &#34;test&#34;: &#34;echo \&#34;Error: no test specified\&#34; &amp;&amp; exit 1&#34;,
+    &#34;start&#34;: &#34;node index.js&#34;
+  },</code></pre>
+<p>All this does is tell npm when we run <code>npm run start</code> then actually run  <code>node index.js</code> which is the command for node to run the index.js file. You will see why we use this script instead of just running the command ourselves later.</p>
+<p>We now have a server running on port 5000! You can navigate to <a href="http://localhost:5000" target="_blank"><code>http://localhost:5000</code></a> to view server.</p>
+<p class="image-container"><img style="width: 315.00px" src="img\c721b71192ae19f7.png"></p>
+<p>This doesn&#39;t look right though surely we should see something! We haven&#39;t created any routes for the server so it doesn&#39;t know what to send us when we view the page. We will explain what routes are in the next section!</p>
+<h2 is-upgraded><strong>Creating routes</strong></h2>
+<h3 is-upgraded><strong>What is routing</strong></h3>
+<p>First lets explain a little about requests that are sent over http. A HTTP request is a message sent to the server from the client asking the server to perform a certain action. These actions could be various things from returning a piece of data to updating a database. When you visit a webpage your browser makes a http (GET) request to the server asking for the HTML of the webpage. There are many types of HTTP requests, we have just mentioned the most common one, the GET request. You make this request when you want some data from the server, that could be a webpage or a piece of data from a database. Some other common requests are POST (Add data to a database), PUT (Update something in the database), DELETE (Remove something from the database). </p>
+<p>When you send a HTTP request you send it to a given address and this is where routing comes in. Whenever you use a different address from the same website, for example adding a <code>/about</code> to the end of the URL you are making a request to a different route (you are sending a get request asking for the about page).</p>
+<p>We need to set up routing so that users of our API can make different requests to different URLs.</p>
+<aside class="special"><p><strong>Extra:</strong> Want to know more about Routing and HTTP Methods? <a href="https://developer.mozilla.org/en-US/docs/Learn/Server-side/Express_Nodejs/routes#:~:text=A%20route%20is%20a%20section,several%20ways%20to%20create%20routes." target="_blank">Click here</a> and <a href="https://rapidapi.com/blog/api-glossary/http-request-methods/#:~:text=How%20Do%20HTTP%20Requests%20Work,status%20information%20about%20the%20request." target="_blank">here</a>!</p>
+</aside>
+<h3 is-upgraded><strong>A simple get route</strong></h3>
+<p>Its very simple to add a basic route. In the code after you have declared the app but before it starts listening, add this.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-the-server/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>app.get(&#39;/&#39;, (request, response) =&gt; {
+    response.json({
+        message: &#39;Manchester&#39;
+    });
+});</code></pre>
+<p>This code is quite hard to explain but the <code>app.get( path, callback)</code>takes the relative path for the route you are building, in this case the path becomes <a href="http://localhost:5000/message" target="_blank"><code>http://localhost:5000/</code></a>. It also calls an anonymous function which takes the request and response as parameters. The request is the data given in the request and the response is the data that you will return. With these parameters it creates a route for the get request. The <code>response.json( object )</code>takes an object and converts it to JSON then sets the response to its value. So all in all when we make a request it will return the object contained within the JSON.</p>
+<p>Let&#39;s check what happens when we restart the server!</p>
+<p class="image-container"><img style="width: 327.00px" src="img\5396e59d4a576e1c.png"></p>
+<p>Great! We have a basic route setup to get some data from the server. But how do we send data to the server?</p>
+<h3 is-upgraded><strong>A simple post route</strong></h3>
+<p>To be able to send some data to be added to the database we need a post route, let&#39;s add one.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/creating-the-server/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>app.post(&#39;/message&#39;, (request, response) =&gt; {
+    console.log(request.body);
+})</code></pre>
+<p>This is very similar to the route that we created previously. We have now created a post route with the address <a href="http://localhost:5000/message" target="_blank"><code>http://localhost:5000/message</code></a>. When it receives a request it will log to the console the body of that request.</p>
+<p>We haven&#39;t got any data to send to this route yet, so we will wait until the next section to test it.</p>
+<aside class="special"><p><strong>Extra:</strong> What is a request body? Or just what is a request in general? <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages#:~:text=HTTP%20requests%20are%20messages%20sent,the%20action%20to%20be%20performed.&text=It%20is%20only%20used%20with%20CONNECT%20when%20setting%20up%20an%20HTTP%20tunnel." target="_blank">Click here</a>!</p>
+</aside>
+<aside class="warning"><p><strong>Remember:</strong> Whenever you change the server you must restart it to see the changes. You can automatically do this with the npm package nodemon. For more info on nodemon visit <a href="https://www.npmjs.com/package/nodemon" target="_blank">here</a>! </p>
+</aside>
+<h2 class="checklist" is-upgraded>What we&#39;ve covered</h2>
+<ul class="checklist">
+<li>Initialising the NPM package.json.</li>
+<li>Using NPM to install a package</li>
+<li>Setting up express</li>
+<li>Creating two routes (get and post)</li>
+<li>Setting up responses for each route.</li>
+</ul>
+<p>Now lets link the front and backends so that they can communicate.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Linking the front end to the backend" duration="5">
+        <h2 class="checklist" is-upgraded>What you&#39;ll learn</h2>
+<ul class="checklist">
+<li>Using the fetch function</li>
+<li>Creating a HTTP request</li>
+<li>Adding middleware to deal with CORS and JSON parsing</li>
+</ul>
+<p>We need to be able to send a message to the server, and we need to be able to retrieve other messages from the server. For this we will need to link the front end and the backend servers.</p>
+<h2 is-upgraded><strong>Sending data to the server</strong></h2>
+<p>To send data to the server we need to send a post request to the post route that we just set up. We will do this on the client side as the client is the one sending the request.</p>
+<p>First of all lets tell the client where we want to get the data from. We defined this in the server as <a href="http://localhost:5000/message" target="_blank"><code>http://localhost:5000/message</code></a> so we will create a variable to store that address at the start of our <code>client.js</code> file.</p>
+<p><code>const API_URL = ‘http://localhost:5000/message&#39;;</code></p>
+<p>Once we have a URL we can make a request to it using the in built <code>fetch</code> function. The function takes a string address and the request information to send like this. The request information includes the type of method, the body in JSON format (in this case the info the user submitted) and the content type which specifies a JSON.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/linking-frontend-and-backend/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>fetch(API_URL, {
+        method: &#39;POST&#39;,
+        body: JSON.stringify(chat),
+        headers: {
+            &#39;content-type&#39;: &#39;application/json&#39;
+        }
+    })</code></pre>
+<p>You place this method inside the event listener arrow function at the end.</p>
+<p>In theory we should now be able to start the server and the client and send data to the server. However, when we do we get something known as a CORS error. </p>
+<p class="image-container"><img style="width: 591.00px" src="img\acb3c5e1c42c0ad7.png"></p>
+<p>Generally CORS is used to protect a server by stopping anyone outside from making requests. However, in our case we want outside clients to be able to make requests. Let&#39;s fix this issue with a simple NPM package.</p>
+<aside class="special"><p><strong>Extra:</strong> Want to know more about the CORS error? <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin" target="_blank">Click here</a>!</p>
+</aside>
+<h2 is-upgraded><strong>Dealing with CORS and JSON objects</strong></h2>
+<p>First inside the server folder lets install the NPM cors module.</p>
+<pre>Intro-to-hackathons\server&gt; npm install cors
+npm WARN server@1.0.0 No repository field.
+
++ cors@2.8.5
+added 2 packages from 2 contributors and audited 56 packages in 1.854s
+found 0 vulnerabilities</pre>
+<p>Then we are going to edit the start of the server <code>index.js</code> file so that it looks like this.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/linking-frontend-and-backend/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>const express = require(&#39;express&#39;);
+const cors = require(&#39;cors&#39;);
+
+const app = express();
+
+app.use(cors());</code></pre>
+<p><code>const cors = require(&#39;cors&#39;);</code></p>
+<p>We are importing the cors module that we have just installed.</p>
+<p><code>app.use(cors());</code></p>
+<p>We are then making the app use the module as a middleware. This will automatically deal with the CORS error by adding the ‘Access-control-allow-origin&#39; header to all requests.</p>
+<p>If we send another chat we no longer see the error but in our server console where we should see the body of the request we see this.</p>
+<pre>Listening on http://localhost:5000
+undefined</pre>
+<p>This is because the server cannot automatically read the JSON object. We need to first parse the object with another piece of middleware.</p>
+<p>This is an easy fix as the middleware is built into express. Just add the following line after the line using cors.</p>
+<p><code>app.use(express.json());</code></p>
+<p>If you restart the server and make submit a chat you should see something like this!</p>
+<pre>Listening on http://localhost:5000
+{ name: &#39;Manchester&#39;, content: &#39;Hello!&#39; }</pre>
+<h2 class="checklist" is-upgraded>What we&#39;ve covered</h2>
+<ul class="checklist">
+<li>Using the fetch function</li>
+<li>Creating a HTTP request</li>
+<li>How to use the cors NPM package</li>
+<li>How to use the express json NPM package</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Adding a database" duration="5">
+        <h2 class="checklist" is-upgraded>What you&#39;ll learn</h2>
+<ul class="checklist">
+<li>How to set up and use Monk</li>
+<li>How to put data into and get data from the database</li>
+</ul>
+<h2 is-upgraded><strong>Setting up monk</strong></h2>
+<p><br>Now we can receive data we need to save it somewhere. This is where our database is going to come in.</p>
+<p>To connect to the MongoDB database that we have installed on our systems we are going to use a NPM package called monk.</p>
+<pre>Intro-to-hackathons\server&gt; npm install monk
+npm WARN server@1.0.0 No repository field.
+
++ monk@7.3.2
+added 26 packages from 85</pre>
+<p>Then lets do the basic setup for monk, inside the <code>index.js</code> add these lines.</p>
+<p><code>const monk = require(&#39;monk&#39;);</code></p>
+<p>This imports the monk package</p>
+<p><code>const db = monk(&#39;localhost/letschat&#39;);</code></p>
+<p>This creates a link to the database <code>letschat</code> which is being hosted on our <code>localhost</code> version of MongoDB, if the database doesn&#39;t exist MongoDB will automatically create one.</p>
+<p><code>const messages = db.get(&#39;messages&#39;);</code></p>
+<p>This will create a collection called <code>messages</code> in the letschat database and assigns it to a variable <code>db</code> so that we can access it in code.</p>
+<h2 is-upgraded><strong>Insert the data</strong></h2>
+<p>Now that we have monk installed we can use it to insert the data into the database. For this we will change the post route to grab the correct data from the request and transform it into an object which we will then insert.</p>
+<p>Let&#39;s change the post route in the <code>index.js</code> file to look like this.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/adding-database/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>app.post(&#39;/message&#39;, (request, response) =&gt; {
+    const message = {
+        name: request.body.name.toString(),
+        content: request.body.content.toString(),
+        created: new Date()
+    }
+
+    messages.insert(message).then(createdMessage =&gt; {
+        response.json(createdMessage);
+    });
+})</code></pre>
+<p>First, we construct an object called <code>message</code> with the attributes name and content being taken from the request. We also add a created attribute with a date created using the JavaScript built in <code>Date()</code> function.</p>
+<pre><code>const message = {
+        name: request.body.name.toString(),
+        content: request.body.content.toString(),
+        created: new Date()
+    }</code></pre>
+<p>Next we insert the data into the collection <code>messages</code> which will return a promise.</p>
+<pre><code>messages.insert(message)</code></pre>
+<p>Finally we use the <code>.next()</code> method of the promise to create a response which contains the object which was inserted into the database</p>
+<pre><code>.then(createdMessage =&gt; {
+        response.json(createdMessage);
+     });</code></pre>
+<aside class="special"><p><strong>Extra:</strong> What is a promise? <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise" target="_blank">Click here</a>!</p>
+</aside>
+<h2 is-upgraded><strong>Checking it works on the client side</strong></h2>
+<p>Lets check that the insert has worked on the client side. We have set up the response so the server will send back the inserted object when the request is successful. Lets check that it worked by logging out the response. To do this we are going to change our fetch function in the <code>client.js</code> to look like this.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/adding-database/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>fetch(API_URL, {
+        method: &#39;POST&#39;,
+        body: JSON.stringify(chat),
+        headers: {
+            &#39;content-type&#39;: &#39;application/json&#39;
+        }
+    }).then(response =&gt; response.json())
+      .then(createdMessage =&gt; {
+          console.log(createdMessage)
+      })</code></pre>
+<p>All we have done is two <code>.then()</code> functions at the end of the fetch. The first <code>.then()</code> just converts the response into JSON format so that we can work with it a little easier.</p>
+<pre><code>.then(response =&gt; response.json())</code></pre>
+<p>The second simply gets the JSONified message and logs it out to the console.</p>
+<pre><code>.then(createdMessage =&gt; {
+          console.log(createdMessage)
+      })</code></pre>
+<p>If we test it we get the data that was inserted into the database including the date we added and an ID for the object!</p>
+<p class="image-container"><img style="width: 624.00px" src="img\386c4f48d161d0af.png"></p>
+<h2 is-upgraded><strong>Getting data from the database</strong></h2>
+<p>Now that we have inserted data into the database we need to be able to get it back out. Lets create a get route for this so the client can make a request to get all the data. In index.js we are going to add this route.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/adding-database/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>app.get(&#39;/message&#39;, (request, response) =&gt; {
+    messages.find().then( messages =&gt; {
+        response.json(messages);
+    });
+});</code></pre>
+<p>Most of this code you should be familiar with as we have written two routes before. </p>
+<pre><code>messages.find()</code></pre>
+<p>This is the only new code which we have not used before. It is a function in monk that will return a promise with all the data in the MongoDB collection. </p>
+<pre><code>.then( messages =&gt; {
+        response.json(messages);
+    });</code></pre>
+<p>Using the promise we then convert the data we got from the database to JSON and return it in the response.</p>
+<p>If we now restart our server and go to <a href="http://localhost:5000/message" target="_blank"><code>http://localhost:5000/message</code></a><code> </code>then we should see something like this.</p>
+<p class="image-container"><img style="width: 624.00px" src="img\bc0c4b2cda1ed0e5.png"></p>
+<p>We can format the data with a JSON formatting extension like this one: <a href="https://chrome.google.com/webstore/detail/json-formatter/bcjindcccaagfpapjjmafapmmgkkhgoa/related?hl=en" target="_blank">JSON Formatter for chrome</a></p>
+<p class="image-container"><img style="width: 395.00px" src="img\b6ab96af3dad3ecd.png"></p>
+<p>This should look familiar, it&#39;s all the messages that we have sent with an ID and a generated date! Now that we can get all the messages from the database we are going to work on displaying them on the page. </p>
+<h2 class="checklist" is-upgraded>What we&#39;ve covered</h2>
+<ul class="checklist">
+<li>How to set up and use Monk</li>
+<li>How to put data into and get data from the database</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Displaying fetched data" duration="5">
+        <h2 class="checklist" is-upgraded>What you&#39;ll learn</h2>
+<ul class="checklist">
+<li>How to create a get request using the fetch function.</li>
+<li>Using bad-words to filter data before putting it into the database</li>
+<li>How to create HTML elements with JavaScript</li>
+</ul>
+<h2 is-upgraded><strong>Fetch the data from the server.</strong></h2>
+<p>Now that we have the database setup, and we know that we can get all the data from it, lets work on displaying that data on the page. The first thing we are going to have to do is create a request on the client to get the data from the server. We are probably going to want to send this request at different points in the program (when the user refreshes, when they send a message) therefore we will wrap it in a function. Edit the <code>client.js</code> file and add this function at the bottom.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>function listAllMessages() {
+    fetch(API_URL, {
+        method: &#39;GET&#39;,
+    }).then(response =&gt; response.json())
+      .then(messages =&gt; {
+          console.log(messages)
+      })
+}</code></pre>
+<p>At this point you should understand what this is doing, its very similar to the previous fetch we wrote only this time we are using the get method, so we don&#39;t have to specify a body or any headers. Now add a call to this function at the top of the file.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>const form = document.querySelector(&#39;form&#39;);
+const API_URL = &#39;http://localhost:5000/message&#39;;
+
+listAllMessages();</code></pre>
+<p>Now if you go back to your browser and refresh the page you should see something like this.</p>
+<p class="image-container"><img style="width: 624.00px" src="img\6f8d933d03ee66f8.png"></p>
+<p>We now have the data inside the client and can work on displaying it.</p>
+<h2 is-upgraded><strong>Filter the data</strong></h2>
+<p>Now that we are going to display the data to the client we don&#39;t want people to be able to send any inappropriate messages on our application, so we need to filter the messages which they can send. There are many NPM packages which you can use for this, we are going to use one called <code>bad-words.</code></p>
+<p>As usual lets install the package in the server folder</p>
+<pre>Intro-to-hackathons\server&gt;npm install bad-words
+npm WARN server@1.0.0 No repository field.
+
++ bad-words@3.0.3
+added 2 packages from 2 contributors and audited 84 packages in 1.816s
+found 0 vulnerabilities</pre>
+<p>Then we will import the module and use it. First, import it in the <code>index.js</code> file.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>const Filter = require(&#39;bad-words&#39;);</code></pre>
+<p>Then we will create an object for it.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>const db = monk(&#39;localhost/letschat&#39;);
+const messages = db.get(&#39;messages&#39;);
+const filter = new Filter();</code></pre>
+<p>Then in the post route we will filter the words before we put them into the database.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>app.post(&#39;/message&#39;, (request, response) =&gt; {
+    const message = {
+        name: filter.clean(request.body.name.toString()),
+        content: filter.clean(request.body.content.toString()),
+        created: new Date()
+    }
+
+    messages.insert(message).then(createdMessage =&gt; {
+        response.json(createdMessage);
+    });
+});</code></pre>
+<p>Now if anyone sends any &#34;bad words&#34; then they will be filtered out. We don&#39;t have a way to display the data at the moment but as an example of what it will look like in the future here is an example!</p>
+<p class="image-container"><img style="width: 402.00px" src="img\ce47349fad407be3.png"></p>
+<p>This is a makes the site a bit more appropriate for a wider audience!</p>
+<h2 is-upgraded><strong>Displaying the data</strong></h2>
+<p>We first need a place to put the data, for this we are going to add an empty div at the end of our <code>index.html</code> file. We will give it a class of messages so that we can select it in our <code>client.js</code> file.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/client/index.html" target="_blank"><code>index.html</code></a></h3>
+<pre><code>        &lt;textarea class=&#34;u-full-width&#34; type=&#34;text&#34; id=&#34;content&#34; name=&#34;content&#34;&gt;&lt;/textarea&gt;
+        &lt;button class=&#34;button-primary&#34;&gt;Send your Chat!&lt;/button&gt;
+      &lt;/form&gt;
+      &lt;div class=&#34;messages&#34;&gt;&lt;/div&gt;
+    &lt;/main&gt;</code></pre>
+<p>We will then select it at the start of the <code>client.js</code> file.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>const form = document.querySelector(&#39;form&#39;);
+const messagesDiv = document.querySelector(&#39;messages&#39;);
+const API_URL = &#39;http://localhost:5000/message&#39;;</code></pre>
+<p>Then inside the list all messages function we are going to add the html to create a list of all previous messages. This is what your listAllMessages function should now look like.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>function listAllMessages() {
+    fetch(API_URL, {
+        method: &#39;GET&#39;,
+    }).then(response =&gt; response.json())
+        .then(messages =&gt; {
+            messageDiv.innerHTML = &#34;&#34;;
+            messages.forEach(message =&gt; {
+                const div = document.createElement(&#39;div&#39;);
+
+                const header = document.createElement(&#39;h3&#39;);
+                header.textContent = message.name;
+                
+                const contents = document.createElement(&#39;p&#39;);
+                contents.textContent = message.content;
+
+                const date = document.createElement(&#39;small&#39;);
+                date.textContent = new Date(message.created);
+
+                div.appendChild(header);
+                div.appendChild(contents);
+                div.appendChild(date);
+
+                messagesDiv.appendChild(div);
+          })
+      })
+}</code></pre>
+<p>We are clearing the <code>messagesDiv</code> and then we are creating a div for each new message. Each div contains a heading with the name of the messenger, a paragraph with the contents of the message and a small which contains the date. We then add each div to the <code>messagesDiv</code> so that we create a list of messages on the page.</p>
+<aside class="special"><p><strong>Extra:</strong> Want to know more about creating HTML elements with JavaScript? <a href="https://www.w3schools.com/js/js_htmldom_nodes.asp" target="_blank">Click here</a>!</p>
+</aside>
+<p>Lets take a look at what we have just done.</p>
+<p class="image-container"><img style="width: 624.00px" src="img\13389564d1de6ccf.png"></p>
+<p>Okay great, we have displayed the data! However, it&#39;s not looking that great at the moment, lets fix that.</p>
+<h2 is-upgraded><strong>Improving the display</strong></h2>
+<p>Let&#39;s improve the user experience and the display. The first easy thing we can do is make the list of elements refresh when the user sends a message. This makes the experience feel more responsive.</p>
+<p>To do this we just call the <code>listAllMessages</code> function in the submit eventListener. We do this at the end of the fetch function so that the message that was just sent is also displayed.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>   }).then(response =&gt; response.json())
+      .then(createdMessage =&gt; {
+          console.log(createdMessage)
+          listAllMessages();
+      })
+});</code></pre>
+<p>Let&#39;s also add some very basic CSS to our <code>styles.css</code> file to centre the messages. </p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/client/styles.css" target="_blank"><code>styles.css</code></a></h3>
+<pre><code>.messages {
+  width: 80%;
+  margin: 0 auto;
+}</code></pre>
+<p>You may have also noticed that our messages are in the order of oldest to newest. Lets change that so that the most recent messages are displayed first. In the <code>listAllMessages</code> function we can add another <code>.then</code> to reverse the list, so they are in most recent order.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/displaying-data/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>function listAllMessages() {
+    fetch(API_URL, {
+        method: &#39;GET&#39;,
+    }).then(response =&gt; response.json())
+        .then(messages =&gt; messages.reverse())
+        .then(messages =&gt; {
+            messagesDiv.innerHtml = &#39;&#39;;</code></pre>
+<p>Our page should now look something like this.</p>
+<p class="image-container"><img style="width: 624.00px" src="img\b1c35751b6150d1f.png"></p>
+<h2 class="checklist" is-upgraded>What we&#39;ve covered</h2>
+<ul class="checklist">
+<li>How to create a get request using the fetch function.</li>
+<li>How to create HTML elements with JavaScript</li>
+</ul>
+<p>We are now done with the building the app, and we can now work on deploying it!</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Deploying the app" duration="0">
+        <h2 class="checklist" is-upgraded>What you&#39;ll learn</h2>
+<ul class="checklist">
+<li>How to use environment variables</li>
+<li>How to set up and link MongoDB Atlas</li>
+<li>How to host the client and server on Heroku</li>
+</ul>
+<h2 is-upgraded><strong>Environment variables</strong></h2>
+<p>When we host on an external server we don&#39;t want to keep the login details for our database in the code as when we push to GitHub we would also upload our credentials. To solve this problem we use something called environment variables. These are variables stored in the environment rather than in the code which your program can access while running.</p>
+<p>In this case we are going to change the address of the database to an environment variable.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/deployment/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>const db = monk(process.env.MONGO_URI || &#39;localhost/letschat&#39;);
+const messages = db.get(&#39;messages&#39;);</code></pre>
+<p>In this case the <code>process.env.MONGO_URI</code> is the <code>MONGO_URI</code> environment variable. If this variable doesn&#39;t exist (we are running it on our local machine) then it will instead connect to the local host which is done with the <code>||</code> operator.</p>
+<p>When we deploy to Heroku we are not going to be able to decide which port to use as Heroku decides this for us. Therefore, inside Heroku it will automatically assign our program a port which we can access through environment variables. </p>
+<p>To make sure this works in our app we are going to edit the index.js with a couple of lines at the end.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/deployment/server/index.js" target="_blank"><code>index.js</code></a></h3>
+<pre><code>const PORT = process.env.PORT || 5000;
+app.listen(PORT, () =&gt; {
+    console.log(&#39;Listening on ${ PORT }&#39;);
+})</code></pre>
+<p>This is similar to the first environment variable example in that if the variable exists it will use it and if not it will use port 5000 as a default.</p>
+<p><strong>Create a MongoDB Atlas cluster</strong></p>
+<p>First lets sign up for MongoDB Atlas <a href="https://account.mongodb.com/account/register?signedOut=true" target="_blank">here</a>. You should see this screen.</p>
+<p class="image-container"><img style="width: 624.00px" src="img\8fe7728474944a32.png"></p>
+<p>We are only creating a basic application so the free tier is enough for us. You can leave all the options as their defaults, but we have decided to change the name of our cluster to DSCManchester. </p>
+<p>You should now be greeted by something like this.</p>
+<p class="image-container"><img style="width: 624.00px" src="img\b0f2b9391de4c5ad.png"></p>
+<p>We are going to follow most of the recommended steps. First lets create a user by clicking on the database access tab and clicking <code>Add New Database User</code>. You should see this screen.</p>
+<p class="image-container"><img style="width: 317.50px" src="img\91fd861eb249ba43.png"></p>
+<p>We are going to use the password authentication method as it&#39;s the simplest to set up. Create a user with a username and password that you can remember and keep a note of them as we will need them later on. All the other options can be left as defaults.</p>
+<p>Now we need to whitelist an IP address to allow it to connect to the server. We are going to allow any IP Address to connect to our database for simplicity. In a real production application you should never do this as it is unsecure. Go to the network access tab and click <code>Add IP Address,</code> you should see this.<img style="width: 624.00px" src="img\8f53a6fa6810859a.png"></p>
+<p>Click <code>allow access from anywhere</code> and confirm. The server will make the changes, and we now have an accessible hosted database!</p>
+<p>To access the database we will need a URL for it. If you go back to the clusters tab and click connect on your cluster then you will get some options on how to connect. Click <code>Connect your application</code> and you will see something like this.</p>
+<p class="image-container"><img style="width: 395.50px" src="img\84143bb697db6fc7.png"></p>
+<p>Copy this connection string as we are going to need it when we host the server.</p>
+<h2 is-upgraded><strong>Hosting the server with Heroku</strong></h2>
+<p>We are going to deploy our server and our client as separate Heroku apps. To do this you need to install <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git" target="_blank">git</a> and the <a href="https://devcenter.heroku.com/articles/heroku-cli#download-and-install" target="_blank">Heroku CLI</a>. You will also need to create an account on <a href="https://signup.heroku.com/php" target="_blank">Heroku</a>.</p>
+<p>Now go into your server folder and run <code>heroku login</code> and follow the instructions to log into your account.</p>
+<p>You then need to initialise the server folder as a git repository and commit all the files into that repository.</p>
+<pre>Intro-to-hackathons\server&gt;git init
+Intro-to-hackathons\server&gt;git add .
+Intro-to-hackathons\server&gt;git commit -m &#34;Deploying the server&#34;</pre>
+<p>You now have all your changes staged, we need to create a Heroku app to push to.</p>
+<pre>Intro-to-hackathons\server&gt;heroku create
+Creating app... done, ⬢ gentle-shore-15785
+https://gentle-shore-15785.herokuapp.com/ | https://git.heroku.com/gentle-shore-15785.git</pre>
+<p>You should see something like this when running <code>heroku create</code> but it will have a random name so yours wont be exactly the same. We now need to add our environment variable to Heroku so that we can connect to our MongoDB database. Remember to get the link for your <strong>own</strong> database and change the password fields.</p>
+<pre>Intro-to-hackathons\server&gt;heroku config:set MONGO_URI=mongodb+srv://DSC:&lt;password&gt;@dscmancheser.xmjc4.mongodb.net/messages?retryWrites=true&amp;w=majority</pre>
+<p>Next we want to push our code to this new Heroku repository.</p>
+<pre>Intro-to-hackathons\server&gt;git push heroku master
+....
+remote:        https://gentle-shore-15785.herokuapp.com/ deployed to Heroku
+remote:
+remote: Verifying deploy... done.
+To https://git.heroku.com/gentle-shore-15785.git
+ * [new branch]      master -&gt; master</pre>
+<p>Hopefully you should see something like this in the console. Go to the address given and make sure that when you view the page you see this:</p>
+<p class="image-container"><img style="width: 428.00px" src="img\da7a478fa4e501cb.png"></p>
+<p>Your server is now being hosted on the internet!</p>
+<h2 is-upgraded><strong>Hosting the client with Heroku</strong></h2>
+<p>Now that we have hosted the server we can connect the client to the server instead of the locally hosted version when its in deployment. Let&#39;s edit the declaration of the API_URL in <code>client.js</code> to reflect this.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/deployment/client/client.js" target="_blank"><code>client.js</code></a></h3>
+<pre><code>const API_URL = window.location.hostname === &#39;localhost&#39; ? &#39;http://localhost:5000/message&#39; : &#39;https://gentle-shore-15785.herokuapp.com/message&#39;;</code></pre>
+<p>We have used a ternary operator to detect if we are hosting the client on localhost, if we are then we use a local server, if not then we should use our hosted server. Bear in mind that we are using the link for our server, you should be using the one that you just created.</p>
+<p>Due to hosting the client as a separate application Heroku need to know how to serve the file that we have given it. To do this we are going to use a quick workaround in php to serve it as a php application without making any changes to code.</p>
+<p>First inside the client folder create a <code>composer.json</code> file. All you need to put inside it are <code>{}.</code></p>
+<p>Then add an <code>index.php</code> file and add the below line.</p>
+<h3 is-upgraded><a href="https://github.com/DSC-UOM/Intro-to-hackathons/blob/stage/deployment/client/index.php" target="_blank"><code>index.php</code></a></h3>
+<pre>&lt;?php include_once(&#34;index.html&#34;); ?&gt;</pre>
+<p>Once that is done your folder structure should look something like this.</p>
+<p class="image-container"><img style="width: 323.00px" src="img\cec0d772a13344eb.png"></p>
+<p>We are now ready to host the client on heroku as well so lets use the same steps as before.</p>
+<pre>Intro-to-hackathons\client&gt;git add .
+Intro-to-hackathons\client&gt;git commit -m &#34;Deploying the client&#34;
+Intro-to-hackathons\client&gt;git push heroku master
+....
+remote:        Released v5
+remote:        https://pure-atoll-90569.herokuapp.com/ deployed to Heroku
+remote:
+remote: Verifying deploy... done.
+To https://git.heroku.com/pure-atoll-90569.git
+   fce6c24..9112e88  master -&gt; master</pre>
+<p>Now if you go to the address then you should have a fully hosted app that anyone can connect to.</p>
+<p class="image-container"><img style="width: 624.00px" src="img\af9b22adc2f6763.png"></p>
+<h2 class="checklist" is-upgraded>What we&#39;ve covered</h2>
+<ul class="checklist">
+<li>How to use environment variables</li>
+<li>How to set up and link MongoDB Atlas</li>
+<li>How to host the client and server on Heroku</li>
+</ul>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Congratulations" duration="0">
+        <p>Congratulations, you&#39;ve successfully built a full webapp! </p>
+<p>You created a client to display data to the user and allow them to submit data and built a API server to interact with a database to store submitted data. You learned how to use npm packages, promises and host it all using Heroku.</p>
+<p>You now know most of the core knowledge for building a basic webapp.</p>
+<h2 is-upgraded><strong>What&#39;s next?</strong></h2>
+<p>Check out some of these codelabs...</p>
+<ul>
+<li><a href="https://codelabs.developers.google.com/codelabs/your-first-pwapp/#0" target="_blank">Creating your first progressive web app</a></li>
+<li><a href="https://flutter.dev/docs/codelabs" target="_blank">Building UI&#39;s with flutter</a></li>
+<li><a href="https://codelabs.developers.google.com/codelabs/go-web-server/index.html?index=..%2F..index#0" target="_blank">Creating a Web Server in Go</a></li>
+</ul>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
